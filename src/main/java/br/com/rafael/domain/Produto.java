@@ -13,6 +13,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Produto implements Serializable{
@@ -32,7 +36,11 @@ public class Produto implements Serializable{
 				inverseJoinColumns = @JoinColumn(name= "categoria_id")
 			)
 	private List<Categoria> categorias = new ArrayList<>();
-	
+        
+        @JsonIgnore
+        @OneToMany(mappedBy = "itemPedidoPK.produto")
+        private Set<ItemPedido> ItemPedidos = new HashSet<>();
+        
 	public Produto() {
 		// TODO Auto-generated constructor stub
 	}
@@ -44,6 +52,17 @@ public class Produto implements Serializable{
 		this.preco = preco;
 	}
 
+        @JsonIgnore
+        public List<Pedido> getPedidos()
+        {
+            List<Pedido> pedidos = new ArrayList<>();
+            for(ItemPedido x: this.ItemPedidos)
+            {
+                pedidos.add(x.getPedido());
+            }
+            return pedidos;
+        }
+        
 	public Integer getId() {
 		return id;
 	}
@@ -75,6 +94,14 @@ public class Produto implements Serializable{
 	public void setCategorias(List<Categoria> categorias) {
 		this.categorias = categorias;
 	}
+
+        public Set<ItemPedido> getItemPedidos() {
+            return ItemPedidos;
+        }
+
+        public void setItemPedidos(Set<ItemPedido> ItemPedidos) {
+            this.ItemPedidos = ItemPedidos;
+        }
 	
 	@Override
 	public int hashCode() {
